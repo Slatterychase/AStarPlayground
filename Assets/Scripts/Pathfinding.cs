@@ -42,6 +42,7 @@ public class Pathfinding : MonoBehaviour
 
                 closedSet.Add(currentNode);
 
+                //if its the target, its reached the goal
                 if (currentNode == targetNode)
                 {
                     sw.Stop();
@@ -49,25 +50,33 @@ public class Pathfinding : MonoBehaviour
                     pathSuccess = true;
                     break;
                 }
-
+                //otherwise loop through all the neighbors
                 foreach (Node neighbor in grid.GetNeighbors(currentNode))
                 {
+                    //ignore neighbors that are either unwalkable or are already in our closed set
                     if (neighbor.walkable == false || closedSet.Contains(neighbor))
                     {
                         continue;
                     }
-                    int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+                    //generate movement cost to neighbor
+                    int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor) + neighbor.movementPenalty;
 
+                    //if distance is shorter than the neighbors or it is not in the open set
                     if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
                     {
                         neighbor.gCost = newMovementCostToNeighbor;
                         neighbor.hCost = GetDistance(neighbor, targetNode);
 
                         neighbor.parent = currentNode;
-
+                        //if not in the open set, add it to the open set
                         if (!openSet.Contains(neighbor))
                         {
                             openSet.Add(neighbor);
+                        }
+                        //otherwise, update its value in the open set
+                        else
+                        {
+                            openSet.UpdateItem(neighbor);
                         }
                     }
                 }
@@ -75,6 +84,7 @@ public class Pathfinding : MonoBehaviour
             }
         }
         yield return null;
+        //if a path is found, retrace the path
         if (pathSuccess)
         {
             waypoints = RetracePath(startNode, targetNode);

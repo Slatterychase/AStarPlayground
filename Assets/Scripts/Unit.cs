@@ -5,7 +5,7 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     public Transform target;
-    float speed = 20;
+    float speed = 10;
     Vector3[] path;
     int targetIndex;
 
@@ -27,12 +27,14 @@ public class Unit : MonoBehaviour
     IEnumerator FollowPath()
     {
         Vector3 currentWaypoint = path[0];
-
+        float startingHeight = currentWaypoint.y;
         while (true)
         {
+            //if reaches current waypoint, get next one
             if (transform.position == currentWaypoint)
             {
                 targetIndex++;
+                //if next one doesnt exist, it has arrived
                 if (targetIndex >= path.Length)
                 {
                     yield break;
